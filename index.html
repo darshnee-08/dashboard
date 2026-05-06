@@ -1,0 +1,1296 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Kanna Tiles & Granites — Business Operations Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:        #0f0f10;
+    --surface:   #17171a;
+    --surface2:  #1e1e23;
+    --border:    #2a2a32;
+    --accent:    #c8a96e;
+    --accent2:   #7c6e4a;
+    --green:     #4ade80;
+    --red:       #f87171;
+    --yellow:    #fbbf24;
+    --blue:      #60a5fa;
+    --text:      #e8e4dc;
+    --muted:     #7a7870;
+    --radius:    12px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ─────────────────────────────────────── */
+  .header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 68px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header-left { display: flex; align-items: center; gap: 18px; }
+
+  .logo-mark {
+    width: 40px; height: 40px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px; color: #0f0f10; font-weight: 700;
+  }
+
+  .brand { display: flex; flex-direction: column; }
+  .brand-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 17px; color: var(--accent); letter-spacing: 0.02em;
+  }
+  .brand-sub { font-size: 11px; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; }
+
+  .header-right { display: flex; align-items: center; gap: 20px; }
+
+  .period-badge {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .period-badge span { color: var(--accent); font-weight: 600; }
+
+  .role-badge {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 6px; padding: 6px 14px;
+    font-size: 12px; color: var(--muted);
+  }
+  .role-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); }
+
+  .live-badge {
+    display: flex; align-items: center; gap: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; color: var(--green);
+    background: rgba(74,222,128,0.08);
+    border: 1px solid rgba(74,222,128,0.2);
+    border-radius: 6px; padding: 5px 12px;
+  }
+  .live-dot {
+    width: 6px; height: 6px; border-radius: 50%; background: var(--green);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  /* ── FILTER PANEL ────────────────────────────────── */
+  .filter-bar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 32px;
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  }
+
+  .filter-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-right: 4px; }
+
+  .filter-btn {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 6px; padding: 6px 14px;
+    font-size: 12px; color: var(--muted); cursor: pointer;
+    transition: all 0.18s; font-family: 'DM Sans', sans-serif;
+  }
+  .filter-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .filter-btn.active { background: rgba(200,169,110,0.12); border-color: var(--accent); color: var(--accent); }
+
+  .filter-divider { width: 1px; height: 24px; background: var(--border); margin: 0 4px; }
+
+  .filter-select {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 6px; padding: 6px 12px;
+    font-size: 12px; color: var(--text);
+    font-family: 'DM Sans', sans-serif; cursor: pointer;
+    appearance: none; padding-right: 28px;
+  }
+
+  /* ── MAIN CONTENT ───────────────────────────────── */
+  .main { padding: 28px 32px; max-width: 1600px; margin: 0 auto; }
+
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 13px; color: var(--accent);
+    text-transform: uppercase; letter-spacing: 0.12em;
+    margin-bottom: 16px; display: flex; align-items: center; gap: 10px;
+  }
+  .section-title::after { content:''; flex:1; height:1px; background: var(--border); }
+
+  /* ── ALERT BANNER ───────────────────────────────── */
+  .alert-banner {
+    background: rgba(248,113,113,0.08);
+    border: 1px solid rgba(248,113,113,0.3);
+    border-radius: var(--radius);
+    padding: 12px 20px;
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 28px;
+    animation: slideDown 0.4s ease;
+  }
+  @keyframes slideDown { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:none} }
+
+  .alert-icon { font-size: 18px; }
+  .alert-text { font-size: 13px; color: var(--red); }
+  .alert-text strong { font-weight: 600; }
+
+  /* ── KPI GRID ────────────────────────────────────── */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .kpi-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .kpi-card:hover { border-color: var(--accent2); transform: translateY(-2px); }
+  .kpi-card::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:2px;
+    background: linear-gradient(90deg, var(--accent), transparent);
+  }
+  .kpi-card.alert::before { background: linear-gradient(90deg, var(--red), transparent); }
+  .kpi-card.warn::before  { background: linear-gradient(90deg, var(--yellow), transparent); }
+  .kpi-card.good::before  { background: linear-gradient(90deg, var(--green), transparent); }
+  .kpi-card.info::before  { background: linear-gradient(90deg, var(--blue), transparent); }
+
+  .kpi-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+  .kpi-value {
+    font-family: 'DM Serif Display', serif;
+    font-size: 32px; color: var(--text); line-height: 1;
+    margin-bottom: 6px;
+  }
+  .kpi-sub { font-size: 12px; color: var(--muted); }
+  .kpi-delta {
+    position: absolute; top: 20px; right: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 600;
+    padding: 3px 8px; border-radius: 4px;
+  }
+  .kpi-delta.up   { color: var(--green); background: rgba(74,222,128,0.1); }
+  .kpi-delta.down { color: var(--red);   background: rgba(248,113,113,0.1); }
+  .kpi-delta.flat { color: var(--yellow);background: rgba(251,191,36,0.1); }
+
+  /* ── CHARTS ROW ──────────────────────────────────── */
+  .charts-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 340px;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .chart-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+  }
+
+  .chart-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 18px;
+  }
+  .chart-title { font-size: 13px; font-weight: 500; color: var(--text); }
+  .chart-meta  { font-size: 11px; color: var(--muted); }
+
+  /* SVG bar chart */
+  .bar-chart { width: 100%; height: 180px; }
+  .bar-chart .bar { transition: opacity 0.2s; }
+  .bar-chart .bar:hover { opacity: 0.75; }
+
+  /* SVG line chart */
+  .line-chart { width: 100%; height: 180px; overflow: visible; }
+
+  /* Donut */
+  .donut-wrap { display: flex; align-items: center; gap: 20px; }
+  .donut-svg  { flex-shrink: 0; }
+  .donut-legend { display: flex; flex-direction: column; gap: 8px; }
+  .legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); }
+  .legend-dot  { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .legend-val  { margin-left: auto; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text); }
+
+  /* ── SECOND CHARTS ROW ───────────────────────────── */
+  .charts-row2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  /* ── PROGRESS BARS ───────────────────────────────── */
+  .progress-list { display: flex; flex-direction: column; gap: 14px; }
+  .progress-item {}
+  .progress-header { display: flex; justify-content: space-between; margin-bottom: 5px; }
+  .progress-label  { font-size: 12px; color: var(--text); }
+  .progress-val    { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); }
+  .progress-track  { height: 6px; background: var(--surface2); border-radius: 99px; overflow: hidden; }
+  .progress-fill   { height: 100%; border-radius: 99px; transition: width 1s ease; }
+
+  /* ── DETAIL TABLE ────────────────────────────────── */
+  .table-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 28px;
+  }
+
+  .table-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .table-title { font-size: 13px; font-weight: 500; color: var(--text); }
+  .table-actions { display: flex; gap: 8px; }
+  .table-btn {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 5px; padding: 5px 12px;
+    font-size: 11px; color: var(--muted); cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .table-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  table { width: 100%; border-collapse: collapse; }
+  thead tr { background: var(--surface2); }
+  th {
+    padding: 10px 16px; text-align: left;
+    font-size: 10px; font-weight: 600; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.08em;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  td {
+    padding: 12px 16px; font-size: 12px;
+    border-bottom: 1px solid rgba(42,42,50,0.5);
+  }
+  tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: var(--surface2); }
+
+  .status-pill {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 9px; border-radius: 99px; font-size: 10px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.05em;
+  }
+  .status-pill .dot { width: 5px; height: 5px; border-radius: 50%; }
+
+  .pill-green { background: rgba(74,222,128,0.1);  color: var(--green); }
+  .pill-green .dot { background: var(--green); }
+  .pill-red   { background: rgba(248,113,113,0.1); color: var(--red); }
+  .pill-red .dot   { background: var(--red); }
+  .pill-yellow{ background: rgba(251,191,36,0.1);  color: var(--yellow); }
+  .pill-yellow .dot{ background: var(--yellow); }
+  .pill-blue  { background: rgba(96,165,250,0.1);  color: var(--blue); }
+  .pill-blue .dot  { background: var(--blue); }
+
+  .mono { font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+
+  /* ── ALERTS SECTION ──────────────────────────────── */
+  .alerts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+
+  .alert-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    display: flex; gap: 14px; align-items: flex-start;
+  }
+  .alert-card.critical { border-color: rgba(248,113,113,0.3); background: rgba(248,113,113,0.04); }
+  .alert-card.warning  { border-color: rgba(251,191,36,0.3);  background: rgba(251,191,36,0.04); }
+  .alert-card.info     { border-color: rgba(96,165,250,0.3);   background: rgba(96,165,250,0.04); }
+
+  .alert-icon-lg { font-size: 22px; flex-shrink: 0; margin-top: 2px; }
+  .alert-body {}
+  .alert-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+  .critical .alert-title { color: var(--red); }
+  .warning  .alert-title { color: var(--yellow); }
+  .info     .alert-title { color: var(--blue); }
+  .alert-desc { font-size: 11px; color: var(--muted); line-height: 1.6; }
+  .alert-action {
+    display: inline-block; margin-top: 8px; font-size: 11px;
+    font-weight: 600; cursor: pointer; padding: 4px 10px;
+    border-radius: 4px;
+  }
+  .critical .alert-action { color: var(--red);    background: rgba(248,113,113,0.1); }
+  .warning  .alert-action { color: var(--yellow); background: rgba(251,191,36,0.1); }
+  .info     .alert-action { color: var(--blue);   background: rgba(96,165,250,0.1); }
+
+  /* ── WASTE VAT SECTION ───────────────────────────── */
+  .vat-row {
+    display: grid; grid-template-columns: 1fr 1.6fr; gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .vat-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 20px;
+  }
+
+  .vat-dial-wrap { display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 10px 0; }
+  .vat-dial-label { font-size: 12px; color: var(--muted); text-align: center; }
+  .vat-value {
+    font-family: 'DM Serif Display', serif; font-size: 56px;
+    color: var(--red); text-align: center; line-height: 1;
+  }
+  .vat-target { font-size: 12px; color: var(--muted); text-align: center; }
+  .vat-target span { color: var(--green); font-weight: 600; }
+
+  .waste-bars { display: flex; flex-direction: column; gap: 12px; margin-top: 4px; }
+  .waste-row  { display: flex; align-items: center; gap: 12px; }
+  .waste-label{ width: 130px; font-size: 12px; color: var(--muted); flex-shrink: 0; }
+  .waste-track{ flex: 1; height: 8px; background: var(--surface2); border-radius: 99px; overflow: hidden; }
+  .waste-fill { height: 100%; border-radius: 99px; }
+  .waste-pct  { width: 36px; text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text); flex-shrink: 0; }
+
+  /* ── STAKEHOLDER MAP ─────────────────────────────── */
+  .stakeholder-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px; margin-bottom: 28px;
+  }
+
+  .stakeholder-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 16px;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .stakeholder-card:hover { border-color: var(--accent2); transform: translateY(-2px); }
+
+  .s-name  { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .s-role  { font-size: 11px; color: var(--accent); margin-bottom: 10px; }
+  .s-tag-list { display: flex; flex-wrap: wrap; gap: 5px; }
+  .s-tag {
+    font-size: 10px; padding: 2px 8px; border-radius: 4px;
+    border: 1px solid var(--border); color: var(--muted);
+  }
+  .s-tag.high { border-color: rgba(248,113,113,0.4); color: var(--red); }
+  .s-tag.med  { border-color: rgba(251,191,36,0.4);  color: var(--yellow); }
+  .s-tag.low  { border-color: rgba(74,222,128,0.4);  color: var(--green); }
+
+  /* ── FOOTER ──────────────────────────────────────── */
+  .footer {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 16px 32px;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 12px;
+  }
+
+  .footer-left { font-size: 11px; color: var(--muted); }
+  .footer-left span { color: var(--accent); }
+  .footer-right { display: flex; gap: 20px; }
+  .footer-meta { font-size: 10px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+
+  /* ── SCROLLBAR ───────────────────────────────────── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* ── RESPONSIVE ──────────────────────────────────── */
+  @media (max-width: 1100px) {
+    .charts-row { grid-template-columns: 1fr 1fr; }
+    .vat-row { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 760px) {
+    .main { padding: 16px; }
+    .header, .filter-bar, .footer { padding-left: 16px; padding-right: 16px; }
+    .charts-row, .charts-row2 { grid-template-columns: 1fr; }
+    .kpi-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     SECTION 1 — HEADER
+══════════════════════════════════════════ -->
+<header class="header">
+  <div class="header-left">
+    <div class="logo-mark">KT</div>
+    <div class="brand">
+      <span class="brand-name">Kanna Tiles &amp; Granites</span>
+      <span class="brand-sub">Business Operations Dashboard</span>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="period-badge">Period: <span>Apr 2025 – Mar 2026</span></div>
+    <div class="role-badge"><div class="role-dot"></div>Owner / Manager View</div>
+    <div class="live-badge"><div class="live-dot"></div>PROTOTYPE</div>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════════
+     SECTION 2 — FILTER PANEL
+══════════════════════════════════════════ -->
+<div class="filter-bar">
+  <span class="filter-label">Period</span>
+  <button class="filter-btn">Today</button>
+  <button class="filter-btn active">This Week</button>
+  <button class="filter-btn">This Month</button>
+  <button class="filter-btn">This Quarter</button>
+  <div class="filter-divider"></div>
+  <span class="filter-label">Category</span>
+  <select class="filter-select">
+    <option>All Products</option>
+    <option>Floor Tiles</option>
+    <option>Wall Tiles</option>
+    <option>Granite Slabs</option>
+    <option>Mosaic / Décor</option>
+    <option>Adhesives &amp; Grout</option>
+  </select>
+  <select class="filter-select">
+    <option>All Customers</option>
+    <option>Homeowners</option>
+    <option>Contractors</option>
+    <option>Interior Designers</option>
+    <option>Commercial</option>
+  </select>
+  <select class="filter-select">
+    <option>All Departments</option>
+    <option>Sales</option>
+    <option>Warehouse</option>
+    <option>Billing</option>
+    <option>Delivery</option>
+  </select>
+  <div class="filter-divider"></div>
+  <span class="filter-label">Status</span>
+  <button class="filter-btn">Alerts Only</button>
+</div>
+
+<!-- ══════════════════════════════════════════
+     MAIN CONTENT
+══════════════════════════════════════════ -->
+<div class="main">
+
+  <!-- Critical alert banner -->
+  <div class="alert-banner">
+    <span class="alert-icon">⚠️</span>
+    <span class="alert-text">
+      <strong>3 Critical Alerts:</strong> Vitrified tile stock below minimum threshold · 2 pending payments overdue &gt;30 days · Delivery vehicle maintenance due
+    </span>
+  </div>
+
+  <!-- ── KPI CARDS ─────────────────────────────────── -->
+  <div class="section-title">Key Performance Indicators</div>
+  <div class="kpi-grid">
+
+    <div class="kpi-card good">
+      <div class="kpi-delta up">+12%</div>
+      <div class="kpi-label">Daily Revenue</div>
+      <div class="kpi-value">₹42K</div>
+      <div class="kpi-sub">Target ₹40,000 · Achieved</div>
+    </div>
+
+    <div class="kpi-card warn">
+      <div class="kpi-delta flat">+2%</div>
+      <div class="kpi-label">Lead Conversion Rate</div>
+      <div class="kpi-value">47%</div>
+      <div class="kpi-sub">Target 65% · 18% gap</div>
+    </div>
+
+    <div class="kpi-card alert">
+      <div class="kpi-delta down">−8%</div>
+      <div class="kpi-label">Stock Health (SKUs)</div>
+      <div class="kpi-value">68%</div>
+      <div class="kpi-sub">6 of 20 fast-movers low</div>
+    </div>
+
+    <div class="kpi-card warn">
+      <div class="kpi-delta down">−5%</div>
+      <div class="kpi-label">Pending Receivables</div>
+      <div class="kpi-value">₹1.8L</div>
+      <div class="kpi-sub">3 accounts &gt;30 days</div>
+    </div>
+
+    <div class="kpi-card good">
+      <div class="kpi-delta up">+3%</div>
+      <div class="kpi-label">On-Time Deliveries</div>
+      <div class="kpi-value">71%</div>
+      <div class="kpi-sub">Target 90% · Needs work</div>
+    </div>
+
+    <div class="kpi-card alert">
+      <div class="kpi-delta down">−15%</div>
+      <div class="kpi-label">VAT Ratio</div>
+      <div class="kpi-value">29%</div>
+      <div class="kpi-sub">Target 60–70% · Critical</div>
+    </div>
+
+    <div class="kpi-card info">
+      <div class="kpi-delta flat">0%</div>
+      <div class="kpi-label">Open Complaints</div>
+      <div class="kpi-value">7</div>
+      <div class="kpi-sub">4 unresolved &gt;2 days</div>
+    </div>
+
+    <div class="kpi-card warn">
+      <div class="kpi-delta flat">—</div>
+      <div class="kpi-label">Dead Stock Value</div>
+      <div class="kpi-value">₹85K</div>
+      <div class="kpi-sub">Est. 20% of warehouse</div>
+    </div>
+
+  </div>
+
+  <!-- ── CHARTS ROW 1 ───────────────────────────────── -->
+  <div class="section-title">Revenue &amp; Sales Analysis</div>
+  <div class="charts-row">
+
+    <!-- Weekly revenue bar chart -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <span class="chart-title">Weekly Revenue by Day (₹)</span>
+        <span class="chart-meta">Current week · placeholder data</span>
+      </div>
+      <svg class="bar-chart" viewBox="0 0 400 180" preserveAspectRatio="xMidYMid meet">
+        <!-- Grid lines -->
+        <line x1="40" y1="20" x2="390" y2="20" stroke="#2a2a32" stroke-width="1"/>
+        <line x1="40" y1="60" x2="390" y2="60" stroke="#2a2a32" stroke-width="1"/>
+        <line x1="40" y1="100" x2="390" y2="100" stroke="#2a2a32" stroke-width="1"/>
+        <line x1="40" y1="140" x2="390" y2="140" stroke="#2a2a32" stroke-width="1"/>
+        <!-- Y labels -->
+        <text x="35" y="23" text-anchor="end" fill="#7a7870" font-size="9" font-family="JetBrains Mono">60K</text>
+        <text x="35" y="63" text-anchor="end" fill="#7a7870" font-size="9" font-family="JetBrains Mono">45K</text>
+        <text x="35" y="103" text-anchor="end" fill="#7a7870" font-size="9" font-family="JetBrains Mono">30K</text>
+        <text x="35" y="143" text-anchor="end" fill="#7a7870" font-size="9" font-family="JetBrains Mono">15K</text>
+        <!-- Bars: Mon–Sun -->
+        <rect class="bar" x="50"  y="80" width="40" height="60" rx="4" fill="#c8a96e" opacity="0.85"/>
+        <rect class="bar" x="105" y="60" width="40" height="80" rx="4" fill="#c8a96e" opacity="0.85"/>
+        <rect class="bar" x="160" y="50" width="40" height="90" rx="4" fill="#c8a96e" opacity="0.85"/>
+        <rect class="bar" x="215" y="90" width="40" height="50" rx="4" fill="#c8a96e" opacity="0.45"/>
+        <rect class="bar" x="270" y="30" width="40" height="110" rx="4" fill="#c8a96e" opacity="0.85"/>
+        <rect class="bar" x="325" y="20" width="40" height="120" rx="4" fill="#4ade80" opacity="0.85"/>
+        <!-- X labels -->
+        <text x="70"  y="165" text-anchor="middle" fill="#7a7870" font-size="9" font-family="DM Sans">Mon</text>
+        <text x="125" y="165" text-anchor="middle" fill="#7a7870" font-size="9" font-family="DM Sans">Tue</text>
+        <text x="180" y="165" text-anchor="middle" fill="#7a7870" font-size="9" font-family="DM Sans">Wed</text>
+        <text x="235" y="165" text-anchor="middle" fill="#7a7870" font-size="9" font-family="DM Sans">Thu</text>
+        <text x="290" y="165" text-anchor="middle" fill="#7a7870" font-size="9" font-family="DM Sans">Fri</text>
+        <text x="345" y="165" text-anchor="middle" fill="#c8a96e" font-size="9" font-family="DM Sans" font-weight="600">Sat</text>
+        <!-- Value labels on bars -->
+        <text x="70"  y="75"  text-anchor="middle" fill="#e8e4dc" font-size="9" font-family="JetBrains Mono">30K</text>
+        <text x="125" y="55"  text-anchor="middle" fill="#e8e4dc" font-size="9" font-family="JetBrains Mono">38K</text>
+        <text x="180" y="45"  text-anchor="middle" fill="#e8e4dc" font-size="9" font-family="JetBrains Mono">42K</text>
+        <text x="235" y="85"  text-anchor="middle" fill="#e8e4dc" font-size="9" font-family="JetBrains Mono">25K</text>
+        <text x="290" y="25"  text-anchor="middle" fill="#e8e4dc" font-size="9" font-family="JetBrains Mono">52K</text>
+        <text x="345" y="15"  text-anchor="middle" fill="#4ade80" font-size="9" font-family="JetBrains Mono">60K</text>
+      </svg>
+    </div>
+
+    <!-- Monthly trend line chart -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <span class="chart-title">Monthly Revenue Trend (₹ Lakhs)</span>
+        <span class="chart-meta">Apr 2025 – Mar 2026</span>
+      </div>
+      <svg class="line-chart" viewBox="0 0 400 180" preserveAspectRatio="xMidYMid meet">
+        <defs>
+          <linearGradient id="lineGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%"   stop-color="#c8a96e" stop-opacity="0.25"/>
+            <stop offset="100%" stop-color="#c8a96e" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <!-- Grid -->
+        <line x1="40" y1="20" x2="390" y2="20" stroke="#2a2a32" stroke-width="1"/>
+        <line x1="40" y1="60" x2="390" y2="60" stroke="#2a2a32" stroke-width="1"/>
+        <line x1="40" y1="100" x2="390" y2="100" stroke="#2a2a32" stroke-width="1"/>
+        <line x1="40" y1="140" x2="390" y2="140" stroke="#2a2a32" stroke-width="1"/>
+        <!-- Y labels -->
+        <text x="35" y="23" text-anchor="end" fill="#7a7870" font-size="9" font-family="JetBrains Mono">2.0L</text>
+        <text x="35" y="63" text-anchor="end" fill="#7a7870" font-size="9" font-family="JetBrains Mono">1.5L</text>
+        <text x="35" y="103" text-anchor="end" fill="#7a7870" font-size="9" font-family="JetBrains Mono">1.0L</text>
+        <text x="35" y="143" text-anchor="end" fill="#7a7870" font-size="9" font-family="JetBrains Mono">0.5L</text>
+        <!-- Area fill -->
+        <polygon fill="url(#lineGrad)"
+          points="55,120 82,110 109,90 136,100 163,70 190,65 217,75 244,60 271,50 298,40 325,55 352,30 379,35 379,140 55,140"/>
+        <!-- Line -->
+        <polyline fill="none" stroke="#c8a96e" stroke-width="2" stroke-linejoin="round"
+          points="55,120 82,110 109,90 136,100 163,70 190,65 217,75 244,60 271,50 298,40 325,55 352,30 379,35"/>
+        <!-- Dots -->
+        <circle cx="55"  cy="120" r="3" fill="#c8a96e"/>
+        <circle cx="82"  cy="110" r="3" fill="#c8a96e"/>
+        <circle cx="109" cy="90"  r="3" fill="#c8a96e"/>
+        <circle cx="136" cy="100" r="3" fill="#c8a96e"/>
+        <circle cx="163" cy="70"  r="3" fill="#c8a96e"/>
+        <circle cx="190" cy="65"  r="3" fill="#c8a96e"/>
+        <circle cx="217" cy="75"  r="3" fill="#c8a96e"/>
+        <circle cx="244" cy="60"  r="4" fill="#4ade80"/>
+        <circle cx="271" cy="50"  r="3" fill="#c8a96e"/>
+        <circle cx="298" cy="40"  r="3" fill="#c8a96e"/>
+        <circle cx="325" cy="55"  r="3" fill="#c8a96e"/>
+        <circle cx="352" cy="30"  r="3" fill="#c8a96e"/>
+        <circle cx="379" cy="35"  r="4" fill="#fbbf24"/>
+        <!-- X labels -->
+        <text x="55"  y="162" text-anchor="middle" fill="#7a7870" font-size="8" font-family="DM Sans">Apr</text>
+        <text x="109" y="162" text-anchor="middle" fill="#7a7870" font-size="8" font-family="DM Sans">Jun</text>
+        <text x="163" y="162" text-anchor="middle" fill="#7a7870" font-size="8" font-family="DM Sans">Aug</text>
+        <text x="217" y="162" text-anchor="middle" fill="#7a7870" font-size="8" font-family="DM Sans">Oct</text>
+        <text x="271" y="162" text-anchor="middle" fill="#7a7870" font-size="8" font-family="DM Sans">Dec</text>
+        <text x="325" y="162" text-anchor="middle" fill="#7a7870" font-size="8" font-family="DM Sans">Feb</text>
+        <text x="379" y="162" text-anchor="middle" fill="#fbbf24" font-size="8" font-family="DM Sans">Mar</text>
+      </svg>
+    </div>
+
+    <!-- Revenue split donut -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <span class="chart-title">Revenue by Category</span>
+        <span class="chart-meta">% share</span>
+      </div>
+      <div class="donut-wrap">
+        <svg class="donut-svg" width="120" height="120" viewBox="0 0 120 120">
+          <!-- Donut segments (stroke-dasharray trick) -->
+          <!-- Circle circumference = 2π×40 ≈ 251.3 -->
+          <circle cx="60" cy="60" r="40" fill="none" stroke="#17171a" stroke-width="20"/>
+          <!-- Tile sales 45% = 113 -->
+          <circle cx="60" cy="60" r="40" fill="none" stroke="#c8a96e" stroke-width="20"
+            stroke-dasharray="113 251" stroke-dashoffset="0" transform="rotate(-90 60 60)"/>
+          <!-- Granite 25% = 63 -->
+          <circle cx="60" cy="60" r="40" fill="none" stroke="#60a5fa" stroke-width="20"
+            stroke-dasharray="63 251" stroke-dashoffset="-113" transform="rotate(-90 60 60)"/>
+          <!-- Wholesale 15% = 38 -->
+          <circle cx="60" cy="60" r="40" fill="none" stroke="#4ade80" stroke-width="20"
+            stroke-dasharray="38 251" stroke-dashoffset="-176" transform="rotate(-90 60 60)"/>
+          <!-- Install 10% = 25 -->
+          <circle cx="60" cy="60" r="40" fill="none" stroke="#fbbf24" stroke-width="20"
+            stroke-dasharray="25 251" stroke-dashoffset="-214" transform="rotate(-90 60 60)"/>
+          <!-- Consult 5% = 13 -->
+          <circle cx="60" cy="60" r="40" fill="none" stroke="#f87171" stroke-width="20"
+            stroke-dasharray="13 251" stroke-dashoffset="-239" transform="rotate(-90 60 60)"/>
+          <text x="60" y="56" text-anchor="middle" fill="#e8e4dc" font-size="14" font-family="DM Serif Display">45%</text>
+          <text x="60" y="70" text-anchor="middle" fill="#7a7870" font-size="8" font-family="DM Sans">Tiles</text>
+        </svg>
+        <div class="donut-legend">
+          <div class="legend-item"><div class="legend-dot" style="background:#c8a96e"></div>Tile Sales<span class="legend-val">45%</span></div>
+          <div class="legend-item"><div class="legend-dot" style="background:#60a5fa"></div>Granite<span class="legend-val">25%</span></div>
+          <div class="legend-item"><div class="legend-dot" style="background:#4ade80"></div>Wholesale<span class="legend-val">15%</span></div>
+          <div class="legend-item"><div class="legend-dot" style="background:#fbbf24"></div>Install<span class="legend-val">10%</span></div>
+          <div class="legend-item"><div class="legend-dot" style="background:#f87171"></div>Consult<span class="legend-val">5%</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── CHARTS ROW 2 ───────────────────────────────── -->
+  <div class="section-title">Inventory &amp; Lead Funnel</div>
+  <div class="charts-row2">
+
+    <!-- Stock levels progress bars -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <span class="chart-title">Fast-Moving Stock Levels (Top 10 SKUs)</span>
+        <span class="chart-meta">% of minimum reorder threshold</span>
+      </div>
+      <div class="progress-list">
+        <div class="progress-item">
+          <div class="progress-header">
+            <span class="progress-label">Vitrified Tiles 600×600</span>
+            <span class="progress-val" style="color:#f87171">18% — CRITICAL</span>
+          </div>
+          <div class="progress-track"><div class="progress-fill" style="width:18%;background:#f87171"></div></div>
+        </div>
+        <div class="progress-item">
+          <div class="progress-header">
+            <span class="progress-label">Black Galaxy Granite</span>
+            <span class="progress-val" style="color:#fbbf24">35% — LOW</span>
+          </div>
+          <div class="progress-track"><div class="progress-fill" style="width:35%;background:#fbbf24"></div></div>
+        </div>
+        <div class="progress-item">
+          <div class="progress-header">
+            <span class="progress-label">Ceramic Wall Tile (Matt)</span>
+            <span class="progress-val" style="color:#fbbf24">42% — LOW</span>
+          </div>
+          <div class="progress-track"><div class="progress-fill" style="width:42%;background:#fbbf24"></div></div>
+        </div>
+        <div class="progress-item">
+          <div class="progress-header">
+            <span class="progress-label">Tile Adhesive (20kg bags)</span>
+            <span class="progress-val" style="color:#4ade80">78% — OK</span>
+          </div>
+          <div class="progress-track"><div class="progress-fill" style="width:78%;background:#4ade80"></div></div>
+        </div>
+        <div class="progress-item">
+          <div class="progress-header">
+            <span class="progress-label">Anti-Skid Outdoor Tiles</span>
+            <span class="progress-val" style="color:#4ade80">65% — OK</span>
+          </div>
+          <div class="progress-track"><div class="progress-fill" style="width:65%;background:#4ade80"></div></div>
+        </div>
+        <div class="progress-item">
+          <div class="progress-header">
+            <span class="progress-label">Rosy Pink Granite Slab</span>
+            <span class="progress-val" style="color:#4ade80">55% — OK</span>
+          </div>
+          <div class="progress-track"><div class="progress-fill" style="width:55%;background:#4ade80"></div></div>
+        </div>
+        <div class="progress-item">
+          <div class="progress-header">
+            <span class="progress-label">Mosaic Glass Tiles</span>
+            <span class="progress-val" style="color:#4ade80">80% — OK</span>
+          </div>
+          <div class="progress-track"><div class="progress-fill" style="width:80%;background:#4ade80"></div></div>
+        </div>
+        <div class="progress-item">
+          <div class="progress-header">
+            <span class="progress-label">Epoxy Grout (all colors)</span>
+            <span class="progress-val" style="color:#fbbf24">28% — LOW</span>
+          </div>
+          <div class="progress-track"><div class="progress-fill" style="width:28%;background:#fbbf24"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lead funnel bar chart (horizontal) -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <span class="chart-title">Sales Lead Funnel — This Week</span>
+        <span class="chart-meta">Conversion gap analysis</span>
+      </div>
+      <div style="padding: 8px 0;">
+        <div class="waste-bars">
+          <div class="waste-row">
+            <span class="waste-label">Total Inquiries</span>
+            <div class="waste-track"><div class="waste-fill" style="width:100%;background:#60a5fa;height:14px;border-radius:6px"></div></div>
+            <span class="waste-pct" style="color:#60a5fa">48</span>
+          </div>
+          <div class="waste-row">
+            <span class="waste-label">Quotations Sent</span>
+            <div class="waste-track"><div class="waste-fill" style="width:79%;background:#c8a96e;height:14px;border-radius:6px"></div></div>
+            <span class="waste-pct">38</span>
+          </div>
+          <div class="waste-row">
+            <span class="waste-label">Follow-ups Done</span>
+            <div class="waste-track"><div class="waste-fill" style="width:35%;background:#fbbf24;height:14px;border-radius:6px"></div></div>
+            <span class="waste-pct" style="color:#fbbf24">17</span>
+          </div>
+          <div class="waste-row">
+            <span class="waste-label">Orders Confirmed</span>
+            <div class="waste-track"><div class="waste-fill" style="width:46%;background:#4ade80;height:14px;border-radius:6px"></div></div>
+            <span class="waste-pct" style="color:#4ade80">22</span>
+          </div>
+          <div class="waste-row">
+            <span class="waste-label">Delivered</span>
+            <div class="waste-track"><div class="waste-fill" style="width:35%;background:#4ade80;height:14px;border-radius:6px"></div></div>
+            <span class="waste-pct" style="color:#4ade80">17</span>
+          </div>
+          <div class="waste-row">
+            <span class="waste-label">Post-Sale Follow-up</span>
+            <div class="waste-track"><div class="waste-fill" style="width:6%;background:#f87171;height:14px;border-radius:6px"></div></div>
+            <span class="waste-pct" style="color:#f87171">3</span>
+          </div>
+          <div class="waste-row">
+            <span class="waste-label">Repeat Purchase</span>
+            <div class="waste-track"><div class="waste-fill" style="width:10%;background:#f87171;height:14px;border-radius:6px"></div></div>
+            <span class="waste-pct" style="color:#f87171">5</span>
+          </div>
+        </div>
+        <div style="margin-top:16px; padding: 10px 12px; background: rgba(248,113,113,0.06); border: 1px solid rgba(248,113,113,0.2); border-radius: 8px;">
+          <span style="font-size:11px; color:#f87171; font-weight:600">⚠ 26 leads lost post-quotation (54% drop-off)</span>
+          <span style="font-size:11px; color:#7a7870; margin-left:8px">— Structured follow-up system required</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── DETAIL TABLE — RECENT ORDERS ──────────────── -->
+  <div class="section-title">Order &amp; Delivery Tracker</div>
+  <div class="table-card">
+    <div class="table-header">
+      <span class="table-title">Recent Orders (Last 7 Days)</span>
+      <div class="table-actions">
+        <button class="table-btn">🔍 Search</button>
+        <button class="table-btn">⬇ Export CSV</button>
+        <button class="table-btn">All Status ▾</button>
+      </div>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Customer</th>
+          <th>Type</th>
+          <th>Product</th>
+          <th>Qty (sq ft)</th>
+          <th>Value (₹)</th>
+          <th>Order Date</th>
+          <th>Delivery</th>
+          <th>Status</th>
+          <th>Payment</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="mono">#ORD-0241</td>
+          <td>Rajesh Kumar</td>
+          <td><span class="status-pill pill-blue"><span class="dot"></span>B2C</span></td>
+          <td>Vitrified 600×600</td>
+          <td>320</td>
+          <td class="mono">₹28,800</td>
+          <td>01 Apr</td>
+          <td>03 Apr</td>
+          <td><span class="status-pill pill-green"><span class="dot"></span>Delivered</span></td>
+          <td><span class="status-pill pill-green"><span class="dot"></span>Paid</span></td>
+        </tr>
+        <tr>
+          <td class="mono">#ORD-0242</td>
+          <td>Priya Interiors</td>
+          <td><span class="status-pill pill-blue"><span class="dot"></span>B2B</span></td>
+          <td>Designer Wall Tiles</td>
+          <td>180</td>
+          <td class="mono">₹22,500</td>
+          <td>02 Apr</td>
+          <td>04 Apr</td>
+          <td><span class="status-pill pill-yellow"><span class="dot"></span>In Transit</span></td>
+          <td><span class="status-pill pill-yellow"><span class="dot"></span>Partial</span></td>
+        </tr>
+        <tr>
+          <td class="mono">#ORD-0243</td>
+          <td>MK Builders</td>
+          <td><span class="status-pill pill-blue"><span class="dot"></span>B2B</span></td>
+          <td>Black Galaxy Granite</td>
+          <td>450</td>
+          <td class="mono">₹67,500</td>
+          <td>02 Apr</td>
+          <td>05 Apr</td>
+          <td><span class="status-pill pill-red"><span class="dot"></span>Delayed</span></td>
+          <td><span class="status-pill pill-yellow"><span class="dot"></span>Advance</span></td>
+        </tr>
+        <tr>
+          <td class="mono">#ORD-0244</td>
+          <td>Anitha Suresh</td>
+          <td><span class="status-pill pill-blue"><span class="dot"></span>B2C</span></td>
+          <td>Anti-Skid Outdoor</td>
+          <td>95</td>
+          <td class="mono">₹8,550</td>
+          <td>03 Apr</td>
+          <td>04 Apr</td>
+          <td><span class="status-pill pill-green"><span class="dot"></span>Delivered</span></td>
+          <td><span class="status-pill pill-green"><span class="dot"></span>Paid</span></td>
+        </tr>
+        <tr>
+          <td class="mono">#ORD-0245</td>
+          <td>Sunrise Hotel</td>
+          <td><span class="status-pill pill-blue"><span class="dot"></span>B2B</span></td>
+          <td>Large Format Commercial</td>
+          <td>800</td>
+          <td class="mono">₹96,000</td>
+          <td>03 Apr</td>
+          <td>07 Apr</td>
+          <td><span class="status-pill pill-yellow"><span class="dot"></span>Packing</span></td>
+          <td><span class="status-pill pill-red"><span class="dot"></span>Pending</span></td>
+        </tr>
+        <tr>
+          <td class="mono">#ORD-0246</td>
+          <td>Ravi Renovations</td>
+          <td><span class="status-pill pill-blue"><span class="dot"></span>B2C</span></td>
+          <td>Mosaic Glass Tiles</td>
+          <td>55</td>
+          <td class="mono">₹11,000</td>
+          <td>04 Apr</td>
+          <td>05 Apr</td>
+          <td><span class="status-pill pill-red"><span class="dot"></span>Complaint</span></td>
+          <td><span class="status-pill pill-green"><span class="dot"></span>Paid</span></td>
+        </tr>
+        <tr>
+          <td class="mono">#ORD-0247</td>
+          <td>Dev Contractors</td>
+          <td><span class="status-pill pill-blue"><span class="dot"></span>B2B</span></td>
+          <td>Ceramic Floor Tile</td>
+          <td>1200</td>
+          <td class="mono">₹84,000</td>
+          <td>04 Apr</td>
+          <td>08 Apr</td>
+          <td><span class="status-pill pill-yellow"><span class="dot"></span>Processing</span></td>
+          <td><span class="status-pill pill-yellow"><span class="dot"></span>Advance</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ── COMPLAINT TABLE ────────────────────────────── -->
+  <div class="section-title">Active Complaints &amp; Issue Tracker</div>
+  <div class="table-card">
+    <div class="table-header">
+      <span class="table-title">Open Customer Complaints</span>
+      <div class="table-actions">
+        <button class="table-btn">⬇ Export</button>
+        <button class="table-btn">Assign Owner ▾</button>
+      </div>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Complaint ID</th>
+          <th>Customer</th>
+          <th>Type</th>
+          <th>Raised On</th>
+          <th>Days Open</th>
+          <th>Assigned To</th>
+          <th>Severity</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="mono">#CMP-017</td>
+          <td>MK Builders</td>
+          <td>Tile batch colour mismatch</td>
+          <td>29 Mar</td>
+          <td style="color:#f87171;font-weight:600">6 days</td>
+          <td>Owner</td>
+          <td><span class="status-pill pill-red"><span class="dot"></span>High</span></td>
+          <td><span class="status-pill pill-yellow"><span class="dot"></span>In Progress</span></td>
+        </tr>
+        <tr>
+          <td class="mono">#CMP-018</td>
+          <td>Ravi Renovations</td>
+          <td>Wrong quantity delivered</td>
+          <td>01 Apr</td>
+          <td style="color:#fbbf24;font-weight:600">3 days</td>
+          <td>Sales Exec</td>
+          <td><span class="status-pill pill-yellow"><span class="dot"></span>Medium</span></td>
+          <td><span class="status-pill pill-yellow"><span class="dot"></span>In Progress</span></td>
+        </tr>
+        <tr>
+          <td class="mono">#CMP-019</td>
+          <td>Priya Interiors</td>
+          <td>Billing amount dispute</td>
+          <td>02 Apr</td>
+          <td style="color:#fbbf24;font-weight:600">2 days</td>
+          <td>Billing Staff</td>
+          <td><span class="status-pill pill-yellow"><span class="dot"></span>Medium</span></td>
+          <td><span class="status-pill pill-blue"><span class="dot"></span>Under Review</span></td>
+        </tr>
+        <tr>
+          <td class="mono">#CMP-020</td>
+          <td>Anitha Suresh</td>
+          <td>2 broken tiles in delivery box</td>
+          <td>04 Apr</td>
+          <td style="color:#4ade80;font-weight:600">0 days</td>
+          <td>Delivery Staff</td>
+          <td><span class="status-pill pill-green"><span class="dot"></span>Low</span></td>
+          <td><span class="status-pill pill-blue"><span class="dot"></span>New</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ── WASTE / VAT SECTION ───────────────────────── -->
+  <div class="section-title">Process Efficiency — Waste Analysis</div>
+  <div class="vat-row">
+
+    <div class="vat-card">
+      <div class="chart-header">
+        <span class="chart-title">Value-Added Time Ratio</span>
+      </div>
+      <div class="vat-dial-wrap">
+        <div class="vat-value">29%</div>
+        <div class="vat-label">of total order process time<br>is value-adding</div>
+        <svg width="200" height="16" viewBox="0 0 200 16">
+          <rect x="0" y="4" width="200" height="8" rx="4" fill="#1e1e23"/>
+          <rect x="0" y="4" width="58" height="8" rx="4" fill="#f87171"/>
+          <rect x="120" y="0" width="2" height="16" fill="#4ade80" opacity="0.6"/>
+          <text x="121" y="13" fill="#4ade80" font-size="8" font-family="JetBrains Mono">Target 60%</text>
+        </svg>
+        <div class="vat-target">Industry target: <span>60–70%</span> VAT ratio</div>
+        <div style="font-size:11px; color:#7a7870; text-align:center; line-height:1.7;">
+          67–73% of process time is<br>
+          <span style="color:#f87171; font-weight:600">non-value-added waste</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="vat-card">
+      <div class="chart-header">
+        <span class="chart-title">Waste by Type (% of total process time)</span>
+        <span class="chart-meta">Based on BPI observation</span>
+      </div>
+      <div class="waste-bars" style="margin-top:8px">
+        <div class="waste-row">
+          <span class="waste-label">⏳ Waiting</span>
+          <div class="waste-track"><div class="waste-fill" style="width:80%;background:#f87171"></div></div>
+          <span class="waste-pct" style="color:#f87171">28%</span>
+        </div>
+        <div class="waste-row">
+          <span class="waste-label">🔄 Rework</span>
+          <div class="waste-track"><div class="waste-fill" style="width:60%;background:#fbbf24"></div></div>
+          <span class="waste-pct" style="color:#fbbf24">21%</span>
+        </div>
+        <div class="waste-row">
+          <span class="waste-label">🚶 Movement</span>
+          <div class="waste-track"><div class="waste-fill" style="width:37%;background:#60a5fa"></div></div>
+          <span class="waste-pct" style="color:#60a5fa">13%</span>
+        </div>
+        <div class="waste-row">
+          <span class="waste-label">📋 Overprocessing</span>
+          <div class="waste-track"><div class="waste-fill" style="width:29%;background:#c8a96e"></div></div>
+          <span class="waste-pct" style="color:#c8a96e">10%</span>
+        </div>
+        <div class="waste-row">
+          <span class="waste-label">📦 Excess Inventory</span>
+          <div class="waste-track"><div class="waste-fill" style="width:20%;background:#a78bfa"></div></div>
+          <span class="waste-pct" style="color:#a78bfa">7%</span>
+        </div>
+        <div class="waste-row">
+          <span class="waste-label">✅ Value Added</span>
+          <div class="waste-track"><div class="waste-fill" style="width:29%;background:#4ade80"></div></div>
+          <span class="waste-pct" style="color:#4ade80">29%</span>
+        </div>
+      </div>
+
+      <div style="margin-top: 18px; border-top: 1px solid var(--border); padding-top: 14px;">
+        <div style="font-size: 11px; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.08em;">Top Bottlenecks</div>
+        <div style="display:flex; flex-wrap:wrap; gap:8px;">
+          <span style="font-size:11px; padding:4px 10px; background:rgba(248,113,113,0.1); border:1px solid rgba(248,113,113,0.25); border-radius:6px; color:#f87171">Owner approval delays</span>
+          <span style="font-size:11px; padding:4px 10px; background:rgba(251,191,36,0.1); border:1px solid rgba(251,191,36,0.25); border-radius:6px; color:#fbbf24">Warehouse disorganisation</span>
+          <span style="font-size:11px; padding:4px 10px; background:rgba(96,165,250,0.1); border:1px solid rgba(96,165,250,0.25); border-radius:6px; color:#60a5fa">Single delivery vehicle</span>
+          <span style="font-size:11px; padding:4px 10px; background:rgba(200,169,110,0.1); border:1px solid rgba(200,169,110,0.25); border-radius:6px; color:#c8a96e">Manual billing queue</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── ALERTS SECTION ─────────────────────────────── -->
+  <div class="section-title">Alerts &amp; Exceptions</div>
+  <div class="alerts-grid">
+    <div class="alert-card critical">
+      <span class="alert-icon-lg">🔴</span>
+      <div class="alert-body">
+        <div class="alert-title">Vitrified Tile Stockout Risk</div>
+        <div class="alert-desc">600×600 vitrified tiles at 18% of minimum threshold. At current demand rate, stockout expected within 3–4 days. Emergency reorder required from primary supplier.</div>
+        <span class="alert-action">→ Place Reorder Now</span>
+      </div>
+    </div>
+    <div class="alert-card critical">
+      <span class="alert-icon-lg">🔴</span>
+      <div class="alert-body">
+        <div class="alert-title">Overdue Receivables — 2 Accounts</div>
+        <div class="alert-desc">MK Builders (₹67,500) and Dev Contractors (₹42,000) have payment outstanding beyond 30 days. Total: ₹1,09,500 at risk. Owner follow-up needed immediately.</div>
+        <span class="alert-action">→ Send Payment Reminder</span>
+      </div>
+    </div>
+    <div class="alert-card warning">
+      <span class="alert-icon-lg">🟡</span>
+      <div class="alert-body">
+        <div class="alert-title">Delivery Vehicle Maintenance Due</div>
+        <div class="alert-desc">Last service: 45 days ago. Vehicle mileage threshold crossed. Unscheduled breakdown risk is high. Schedule service this week to avoid delivery disruption.</div>
+        <span class="alert-action">→ Schedule Service</span>
+      </div>
+    </div>
+    <div class="alert-card warning">
+      <span class="alert-icon-lg">🟡</span>
+      <div class="alert-body">
+        <div class="alert-title">26 Quotations Without Follow-up</div>
+        <div class="alert-desc">26 leads received quotations this week with no follow-up contact. At historical conversion rates, 5–6 additional orders can be recovered through targeted callbacks today.</div>
+        <span class="alert-action">→ Assign Follow-up Calls</span>
+      </div>
+    </div>
+    <div class="alert-card warning">
+      <span class="alert-icon-lg">🟡</span>
+      <div class="alert-body">
+        <div class="alert-title">Dead Stock Review Overdue</div>
+        <div class="alert-desc">~₹85,000 worth of dead stock (discontinued designs, excess batch) is occupying 20% of warehouse space. Monthly clearance review is 3 weeks overdue.</div>
+        <span class="alert-action">→ Schedule Clearance</span>
+      </div>
+    </div>
+    <div class="alert-card info">
+      <span class="alert-icon-lg">🔵</span>
+      <div class="alert-body">
+        <div class="alert-title">MK Builders Batch Complaint — Day 6</div>
+        <div class="alert-desc">CMP-017 (tile colour mismatch) is open for 6 days, exceeding the 3-day target resolution time. Supplier replacement batch ETA and customer communication pending.</div>
+        <span class="alert-action">→ Update Customer</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── STAKEHOLDER MAP ───────────────────────────── -->
+  <div class="section-title">Stakeholder Dependency &amp; Risk Map</div>
+  <div class="stakeholder-grid">
+    <div class="stakeholder-card">
+      <div class="s-name">Shop Owner</div>
+      <div class="s-role">Overall Management &amp; Decision Maker</div>
+      <div class="s-tag-list">
+        <span class="s-tag high">Bottleneck: ALL decisions</span>
+        <span class="s-tag high">95% time utilised</span>
+        <span class="s-tag med">No delegate backup</span>
+      </div>
+    </div>
+    <div class="stakeholder-card">
+      <div class="s-name">Senior Sales Executive</div>
+      <div class="s-role">Customer Consultation &amp; Lead Handling</div>
+      <div class="s-tag-list">
+        <span class="s-tag med">Key person risk</span>
+        <span class="s-tag med">1–2 day substitute time</span>
+        <span class="s-tag low">Follow-up inconsistency</span>
+      </div>
+    </div>
+    <div class="stakeholder-card">
+      <div class="s-name">Purchase Manager</div>
+      <div class="s-role">Supplier Procurement &amp; Reorder</div>
+      <div class="s-tag-list">
+        <span class="s-tag high">Cannot substitute</span>
+        <span class="s-tag high">3–5 day risk window</span>
+        <span class="s-tag med">Reactive only</span>
+      </div>
+    </div>
+    <div class="stakeholder-card">
+      <div class="s-name">Warehouse Manager</div>
+      <div class="s-role">Stock Control &amp; Dispatch</div>
+      <div class="s-tag-list">
+        <span class="s-tag med">Manual stock counts</span>
+        <span class="s-tag med">No zone labelling</span>
+        <span class="s-tag low">1-day substitute</span>
+      </div>
+    </div>
+    <div class="stakeholder-card">
+      <div class="s-name">Billing Staff</div>
+      <div class="s-role">Invoice Generation &amp; Payment</div>
+      <div class="s-tag-list">
+        <span class="s-tag med">Manual process</span>
+        <span class="s-tag low">1-day substitute</span>
+        <span class="s-tag low">Discount disputes</span>
+      </div>
+    </div>
+    <div class="stakeholder-card">
+      <div class="s-name">Delivery Driver</div>
+      <div class="s-role">Last-Mile Delivery &amp; Logistics</div>
+      <div class="s-tag-list">
+        <span class="s-tag high">Single vehicle</span>
+        <span class="s-tag high">No backup driver</span>
+        <span class="s-tag low">Same-day sub possible</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 3 KEY IMPROVEMENTS ────────────────────────── -->
+  <div class="section-title">BPI Recommendations — Implementation Tracker</div>
+  <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:16px; margin-bottom:28px;">
+
+    <div style="background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:20px; border-top:3px solid #4ade80;">
+      <div style="font-size:11px; color:#4ade80; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px;">Priority 1 — Week 1</div>
+      <div style="font-size:15px; font-weight:600; color:var(--text); margin-bottom:8px;">Billing + Inventory Software</div>
+      <div style="font-size:12px; color:var(--muted); line-height:1.7; margin-bottom:12px;">Install Vyapar (free) app. Enter product catalogue. Train billing staff in 1 day. Go live immediately.</div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <span style="font-size:11px; padding:3px 9px; background:rgba(74,222,128,0.1); border-radius:4px; color:#4ade80">₹0 cost</span>
+        <span style="font-size:11px; padding:3px 9px; background:rgba(74,222,128,0.1); border-radius:4px; color:#4ade80">40% ↓ billing errors</span>
+        <span style="font-size:11px; padding:3px 9px; background:rgba(74,222,128,0.1); border-radius:4px; color:#4ade80">2 hrs/day saved</span>
+      </div>
+      <div style="margin-top:12px;">
+        <div style="font-size:10px; color:var(--muted); margin-bottom:4px;">Implementation Progress</div>
+        <div style="height:6px; background:var(--surface2); border-radius:99px;"><div style="width:15%;height:100%;background:#4ade80;border-radius:99px;"></div></div>
+        <div style="font-size:10px; color:var(--muted); margin-top:3px;">15% — Planning stage</div>
+      </div>
+    </div>
+
+    <div style="background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:20px; border-top:3px solid #c8a96e;">
+      <div style="font-size:11px; color:#c8a96e; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px;">Priority 2 — Week 2</div>
+      <div style="font-size:15px; font-weight:600; color:var(--text); margin-bottom:8px;">WhatsApp Business Follow-up Protocol</div>
+      <div style="font-size:12px; color:var(--muted); line-height:1.7; margin-bottom:12px;">Convert to WA Business, set auto-reply, build broadcast list, define 5-stage follow-up script.</div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <span style="font-size:11px; padding:3px 9px; background:rgba(200,169,110,0.1); border-radius:4px; color:#c8a96e">₹0 cost</span>
+        <span style="font-size:11px; padding:3px 9px; background:rgba(200,169,110,0.1); border-radius:4px; color:#c8a96e">+20% conversion</span>
+        <span style="font-size:11px; padding:3px 9px; background:rgba(200,169,110,0.1); border-radius:4px; color:#c8a96e">0 leads lost</span>
+      </div>
+      <div style="margin-top:12px;">
+        <div style="font-size:10px; color:var(--muted); margin-bottom:4px;">Implementation Progress</div>
+        <div style="height:6px; background:var(--surface2); border-radius:99px;"><div style="width:5%;height:100%;background:#c8a96e;border-radius:99px;"></div></div>
+        <div style="font-size:10px; color:var(--muted); margin-top:3px;">5% — Not started</div>
+      </div>
+    </div>
+
+    <div style="background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:20px; border-top:3px solid #60a5fa;">
+      <div style="font-size:11px; color:#60a5fa; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px;">Priority 3 — Week 3–4</div>
+      <div style="font-size:15px; font-weight:600; color:var(--text); margin-bottom:8px;">5S Warehouse Organisation</div>
+      <div style="font-size:12px; color:var(--muted); line-height:1.7; margin-bottom:12px;">Sort dead stock, zone-label shelves, set min stock levels for top-20 fast-movers.</div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <span style="font-size:11px; padding:3px 9px; background:rgba(96,165,250,0.1); border-radius:4px; color:#60a5fa">₹500–2K</span>
+        <span style="font-size:11px; padding:3px 9px; background:rgba(96,165,250,0.1); border-radius:4px; color:#60a5fa">30% ↓ fulfilment time</span>
+        <span style="font-size:11px; padding:3px 9px; background:rgba(96,165,250,0.1); border-radius:4px; color:#60a5fa">Safer warehouse</span>
+      </div>
+      <div style="margin-top:12px;">
+        <div style="font-size:10px; color:var(--muted); margin-bottom:4px;">Implementation Progress</div>
+        <div style="height:6px; background:var(--surface2); border-radius:99px;"><div style="width:0%;height:100%;background:#60a5fa;border-radius:99px;"></div></div>
+        <div style="font-size:10px; color:var(--muted); margin-top:3px;">0% — Scheduled Week 3</div>
+      </div>
+    </div>
+
+  </div>
+
+</div><!-- /main -->
+
+<!-- ══════════════════════════════════════════
+     SECTION 7 — FOOTER
+══════════════════════════════════════════ -->
+<footer class="footer">
+  <div class="footer-left">
+    Dashboard: <span>Kanna Tiles &amp; Granites — Business Operations</span> ·
+    Data source: <span>BPI Industry Visit Report (28 Mar 2026)</span> ·
+    Submitted by: <span>S. Darshnee · 7376251EI107 · EI Dept · BIT Sathy</span>
+  </div>
+  <div class="footer-right">
+    <div class="footer-meta">
+      <svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="none" stroke="#7a7870" stroke-width="1"/><line x1="5" y1="2" x2="5" y2="5.5" stroke="#7a7870" stroke-width="1"/><line x1="5" y1="5.5" x2="7" y2="7" stroke="#7a7870" stroke-width="1"/></svg>
+      Last Updated: 04 Apr 2026, 14:32
+    </div>
+    <div class="footer-meta">
+      <svg width="10" height="10" viewBox="0 0 10 10"><rect x="1" y="1" width="8" height="8" rx="1.5" fill="none" stroke="#7a7870" stroke-width="1"/><line x1="1" y1="3.5" x2="9" y2="3.5" stroke="#7a7870" stroke-width="1"/></svg>
+      GP Holiday Challenge — D4 HTML Prototype
+    </div>
+    <div class="footer-meta" style="color:#c8a96e;">v1.0 · Prototype</div>
+  </div>
+</footer>
+
+<script>
+  // Filter button toggle
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const siblings = btn.parentElement.querySelectorAll('.filter-btn');
+      if(['Today','This Week','This Month','This Quarter'].includes(btn.textContent)) {
+        siblings.forEach(b => {
+          if(['Today','This Week','This Month','This Quarter'].includes(b.textContent)) b.classList.remove('active');
+        });
+        btn.classList.add('active');
+      }
+    });
+  });
+</script>
+
+</body>
+</html>
